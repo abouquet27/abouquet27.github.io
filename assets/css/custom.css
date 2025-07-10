@@ -1,0 +1,25 @@
+body {
+    text-align: justify;
+}
+
+img {
+    border-radius: 8px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+
+}
+
+figcaption {
+    font-style: italic;
+}
+
+.post-description {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.headline {
+    margin-bottom: 5px;
+}

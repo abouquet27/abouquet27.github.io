@@ -1,0 +1,10 @@
+{{ with .Params.bibliography }}
+<h2>References</h2>
+<ol>
+    {{ range . }}
+    <li>
+        {{ .author }} ({{ .year }}). <strong>{{ .title }}</strong>. {{ .publisher }}.
+    </li>
+    {{ end }}
+</ol>
+{{ end }}

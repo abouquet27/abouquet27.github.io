@@ -1,0 +1,129 @@
+baseURL = "/"
+languageCode = "en-us"
+name = "Adrien Bouquet"
+title = "Adrien's Dashbook"
+theme = "poison"
+paginate = 10
+pluralizelisttitles = false   # removes the automatically appended "s" on sidebar entries
+customCSS = ["/custom.css"]
+
+# NOTE: If using Disqus as commenting engine, uncomment and configure this line
+# disqusShortname = "yourDisqusShortname"
+
+[security]
+  enableInlineShortcodes = false
+  [security.exec]
+    allow = ['^(dart-)?sass(-embedded)?$', '^go$', '^git$', '^npx$', '^postcss$', '^tailwindcss$', 'pandoc']
+    osEnv = ['(?i)^((HTTPS?|NO)_PROXY|PATH(EXT)?|APPDATA|TE?MP|TERM|GO\w+|(XDG_CONFIG_)?HOME|USERPROFILE|SSH_AUTH_SOCK|DISPLAY|LANG|SYSTEMDRIVE)$']
+  [security.funcs]
+    getenv = ['^HUGO_', '^CI$']
+  [security.http]
+    methods = ['(?i)GET|POST']
+    urls = ['.*']
+
+[params]
+    brand = "Adrien's Dashbook"                      # name of your site - appears in the sidebar
+    brand_image = "/images/adrienacco2.jpg"    # path to the image shown in the sidebar
+    description = "My personnal blog where I share interesting stuff" # Used as default meta description if not specified in front matter
+    dark_mode = true                      # optional - defaults to false
+    favicon =  'https://github.com/abouquet27.png'       
+    front_page_content = ["about", "posts"]
+    toc =true
+    math = true
+
+    # path to favicon (defaults to favicon.png)
+
+    # MENU PLACEHOLDER
+    # Menu dict keys:
+        # Name:         The name to display on the menu.
+        # URL:          The directory relative to the content directory.
+        # HasChildren:  If the directory's files should be listed.  Default is true.
+        # Limit:        If the files should be listed, how many should be shown.
+    menu = [
+        {Name = "About", URL = "/about/", HasChildren = false},
+        {Name = "Writings", URL ="/writings/", HasChildren = false},
+        {Name = "Posts", URL = "/posts/", HasChildren = true, Limit = 5},
+    ]
+
+    # Links to your socials.  Comment or delete any you don't need/use. 
+    email_url = "mailto:adrien.bouquet@bluewin.ch"
+    github_url = "https://github.com/abouquet27"
+    gitlab_url = "https://gitlab.com/abouquet27"
+    linkedin_url = "https://www.linkedin.com/in/adrien-bouquet-3a1a742a4/"
+    telegram_url = "https://t.me/adrbqt"
+    tryhackme_url = "https://tryhackme.com/p/adrbqt"
+
+    # NOTE: If you don't want to use RSS, comment or delete the following lines
+    # Adds an RSS icon to the end of the socials which links to {{ .Site.BaseURL }}/index.xml
+    rss_icon = false
+    # Which section the RSS icon links to, defaults to all content. See https://gohugo.io/templates/rss/#section-rss
+    rss_section = "posts"
+
+    # Hex colors for your sidebar.
+    moon_sun_background_color = "#1b1838"   # default isrgb(24, 14, 109)
+    moon_sun_color = "#FFF"                 # default is #FFF
+    sidebar_a_color = "#FFF"                # default is #FFF
+    sidebar_bg_color = "#1b1838"            # default is  #1b1838
+    sidebar_h1_color = "#FFF"               # default is #FFF
+    sidebar_img_border_color = "#FFF"    # default is #515151
+    sidebar_p_color = "#C0C0C0"             # default is #909090
+    sidebar_socials_color = "#FFF"          # default is #FFF
+
+    # Hex colors for your content in light mode.
+    code_color = "#000"                     # default is #000
+    code_background_color = "#FAF9F6"       # default is #E5E5E5
+    code_block_color = "#FFF"               # default is #FFF
+    code_block_background_color = "#1b1838" # default is #0b0432
+    content_bg_color = "#FAF9F6"            # default is #FAF9F6
+    date_color = "#515151"                  # default is #515151
+    link_color = "#5e0ea5"                  # default is #5e0ea5
+    list_color = "#2b3563"                        # default is #5A5A5A
+    post_title_color = "#303030"            # default is #303030
+    table_border_color = "#E5E5E5"          # default is #E5E5E5
+    table_stripe_color = "#F9F9F9"          # default is #F9F9F9
+    text_color = "#222"                     # default is #222
+
+    # Hex colors for your content in dark mode
+    code_color_dark = "#FFF"                        # default is #FFF
+    code_background_color_dark = "#14102a"          # default is #303754
+    code_block_color_dark = "#FFF"                  # default is #FFF
+    code_block_background_color_dark = " #14102a"    # default is #040114
+    content_bg_color_dark = "#14102a"               # default is #0a0233
+    date_color_dark = "#AAAAAA"                     # default is #7e7c7c
+    link_color_dark = "#05fe68"                     # default is #05fe68
+    list_color_dark =  "#DBE2E9"                  # default isrgb(33, 35, 100)
+    post_title_color_dark = "#DBE2E9"               # default is #DBE2E9
+    table_border_color_dark = "#C0C0C0"             # default isrgb(3, 2, 2)
+    table_stripe_color_dark = "#14102a"               # default is #202020
+    text_color_dark = "#EEE"                        # default is #EEE
+
+    # NOTE: If using Remark42 as commenting engine, uncomment and configure these lines
+    # remark42 = true
+    # remark42_host = "https://yourhost.com"
+    # remark42_site_id = "your_site_id"
+    
+    # NOTE: The following three params are optional and are used to create meta tags + enhance SEO.
+    # og_image = ""                       # path to social icon - front matter: image takes precedent, then og_image, then brand_url
+                                          # this is also used in the schema output as well. Image is resized to max 1200x630
+                                          # For this to work though og_image and brand_url must be a path inside the assets directory
+                                          # e.g. /assets/images/site/og-image.png becomes images/site/og-image.png
+    # publisher_icon = ""                 # path to publisher icon - defaults to favicon, used in schema
+
+[taxonomies]
+    series = 'series'
+    tags = 'tags'
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
+    
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]

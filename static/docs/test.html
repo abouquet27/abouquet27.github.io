@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Adrien Bouquet" />
+  <title>Constant-Time Fully Homomorphic Encryption, Decryption &amp; Key Generation</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Constant-Time Fully Homomorphic Encryption, Decryption
+&amp; Key Generation</h1>
+<p class="author">Adrien Bouquet</p>
+<p class="date">Spring 2025</p>
+</header>
+<!-- 
+To compile the document:
+
+pandoc REPORT.md --bibliography=references.bib --csl=ieee.csl --citeproc --pdf-engine=pdflatex -o report.pdf 
+-->
+<!-- \newcommand{\MLKEM}{ML-KEM} -->
+<!-- Fully Homomorphic Encryption, or FHE, is a powerful cryptographic scheme and a privacy-preserving technology. It has a wide range of application such as Secure Cloud Computing, Healthcare Data Processing, or  -->
+<!---
+Maybe Cite the original paper of FHE ?
+-->
+<!-- Audience are Master students with the same level of expertise as mine
+START WITH THE RELATED WORKS, TECHNICAL SECTION AND THE RESULTS FIRST -->
+<h2 data-number="1" id="introduction"><span
+class="header-section-number">1</span> Introduction</h2>
+<p>The development of quantum computers presents a significant threat to
+classical Public-Key cryptographic systems. Many widely deployed
+cryptographic primitives, such as RSA, Diffie-Hellman, and Elliptic
+Curve Cryptography (ECC)—rely on the hardness of integer factorization
+or the discrete logarithm problem. These problems are vulnerable to
+quantum computers, and therefore enhance research on post-quantum
+cryptographic scheme.</p>
+<p>Plenty of PQC schemes typically rely on lattice-based cryptography
+because its strong security proofs, efficient implementations, and its
+ranges of applications such as public-key cryptography, digital
+signatures, and homomorphic encryption. Fully Homomorphic Encryption
+(FHE) is a powerful cryptographic primitive that allows arbitrary
+computation on encrypted data without needing to decrypt it. FHE schemes
+have based their hardness assumptions on NP-Hard Lattice problem, like
+Learning With Errors (LWE) and its ring variant (Ring-LWE), both of
+which are believed to be quantum-resistant.</p>
+<p>A FHE scheme is an encryption algorithm based on the property of
+performing operations on encrypted data while ensuring the result’s
+correctness once decrypted. Such a property allows one (or more) party
+to encrypt its data and outsources it to an untrusted party (for
+instance, a cloud server), which will compute the correct result and
+returns to the sender, without this computing party learning the value
+of the encrypted data, thus preserving the privacy of the original
+party.</p>
+<p>To achieve this property, this cryptographic primitive leverages a
+homomorphism between the plaintext domain and the ciphertext domain and
+respects the following properties: <span class="math display"> Enc(a +
+b) = Enc(a) + Enc(b)</span> <span class="math display"> Enc(a \times b)
+= Enc(a) \times Enc(b) </span></p>
+<p>FHE is deployed in system requiring privacy-preserving computation,
+secure data outsourcing, and applications such as encrypted machine
+learning, secure voting, and private search. Therefore, there is a
+strong important interest in ensure that fully homomorphic encryption
+schemes are secure, cryptographically as well as in their
+implementations.</p>
+<p>In the next section, we will discuss the theoretical background to
+understand the BGV scheme, an FHE scheme, and present the scheme in
+itself. Then, we briefly discuss side-channel attacks and the
+constant-time implementation of BGV as well as the tools used to make
+this implementation.</p>
+<h2 data-number="2" id="preliminaries"><span
+class="header-section-number">2</span> Preliminaries</h2>
+<h3 data-number="2.1" id="regev-encryption-scheme"><span
+class="header-section-number">2.1</span> Regev encryption scheme</h3>
+<p>In <span class="citation" data-cites="LWEandRegevEncryptionScheme"><a
+href="#ref-LWEandRegevEncryptionScheme"
+role="doc-biblioref">[1]</a></span>, Regev introduced the
+<strong>learning with error (LWE)</strong>, a lattice problem, as well
+as the cryptographic system resulting from this new problem. The goal is
+to hide information by using a secret vector and adding noise so that it
+becomes hard to guess without the secret. The problem is defined as
+follows:</p>
+<p><strong>LWE Definition</strong> Let <span
+class="math inline">\mathbf{s} \in \mathbb{Z}_{q}^n</span> a secret
+vector, <span class="math inline">\mathbf{a} \in \mathbb{Z}_{q}^n</span>
+a vector chosen uniformly at random, <span class="math inline">e \gets
+\chi</span> an noise sampled from an error distribution <span
+class="math inline">\chi</span> (often a discrete Gaussian), and we
+output the pair <span class="math inline">(\mathbf{a}, b = \langle
+\mathbf {a}, \mathbf{s} \rangle + e \; \text{mod $q$})</span>. Given
+many polynomially pair samples <span class="math inline">(\mathbf{a}_i,
+b_i)</span>, find the fixed secret vector <span
+class="math inline">\mathbf{s}</span></p>
+<p>Without the error term <span class="math inline">e</span>, it would
+be simple to solve the equation system. However, Regev showed that
+adding <span class="math inline">e</span> makes LWE at least as hard to
+solve as several worst-case lattice problems, such as GapSVP or SIVP.
+<span class="citation" data-cites="cryptoeprint:2015/939"><a
+href="#ref-cryptoeprint:2015/939" role="doc-biblioref">[2]</a></span>.
+From this quantum hardness, Regev establishes a new public-key
+cryptosystem:</p>
+<ul>
+<li><strong>The private key</strong> is the secret vector <span
+class="math inline">\mathbf{s} \in \mathbb{Z}_{q}^n</span>.</li>
+<li><strong>The public key</strong> is a list of <span
+class="math inline">m</span> pairs <span
+class="math inline">(\mathbf{a_i}, b_i)</span> where <span
+class="math inline">b_i = \langle \mathbf{a_i}, \mathbf{s} \rangle + e
+\; \text{mod $q$}</span>, <span class="math inline">a_i \in
+\mathbb{Z}_{q}^n</span> and <span class="math inline">e_i \gets
+\chi</span>.</li>
+<li><strong>To encrypt</strong> a bit <span
+class="math inline">x</span>, we choose a random subset <span
+class="math inline">\mathit{S}</span> of the <span
+class="math inline">m</span> pairs. Then, the encryption of this bit is
+<span class="math inline">(\sum_{i \in \mathit{S}}\mathbf{a_i}, \sum_{i
+\in \mathit{S}}b_i + \lfloor \frac{q}{2} \rfloor x)</span></li>
+<li><strong>To decrypt</strong> this pair <span
+class="math inline">(\mathbf{a}, b)</span>, we return <span
+class="math inline">0</span> if <span class="math inline">b- \langle
+\mathbf {a}, \mathbf{s} \rangle</span> is closer to <span
+class="math inline">0</span> more than <span class="math inline">\lfloor
+\frac{q}{2} \rfloor</span> modulo <span class="math inline">q</span>, or
+<span class="math inline">1</span> otherwise.</li>
+</ul>
+<p>In 2010 <span class="citation" data-cites="RLWE"><a href="#ref-RLWE"
+role="doc-biblioref">[3]</a></span>, Lyubashevsky, Peikert and Regev
+introduced an algebraic variant <em>Ring</em>-LWE, the
+<em>ring</em>-based learning with error problem. From the original paper
+<span class="citation" data-cites="RLWE"><a href="#ref-RLWE"
+role="doc-biblioref">[3]</a></span>, this new RLWE problem has the same
+security strength as LWE, while being more efficient. For instance, the
+polynomial multiplication can be computed efficiently by using the
+Fast-Fourier Transforms (or variants such as the Number Theoretical
+Transform) with highly optimized implementations.</p>
+<p><strong>LWE</strong> had an important impact on post-quantum
+cryptography. Many variants of this problem have been introduced and
+demonstrated, whereas several cryptographic algorithms have been based
+on this problem (or its variants). For instance, some Public-Key
+Cryptosystems, such as CRYSTALS-KYBER <span class="citation"
+data-cites="kyber"><a href="#ref-kyber"
+role="doc-biblioref">[4]</a></span>, FHE schemes, as BFV or BGV<span
+class="citation" data-cites="BGV"><a href="#ref-BGV"
+role="doc-biblioref">[5]</a></span>, or Digital Signature schemes, as
+CRYSTALS-Dilithium, are based on variants of LWE.</p>
+<p>Regarding the scope of this paper, we will be focusing primarly on
+BGV scheme<span class="citation" data-cites="BGV"><a href="#ref-BGV"
+role="doc-biblioref">[5]</a></span>.</p>
+<h3 data-number="2.2" id="bgv-encryption-scheme"><span
+class="header-section-number">2.2</span> BGV encryption scheme</h3>
+<p>Introduced in <span class="citation" data-cites="BGV"><a
+href="#ref-BGV" role="doc-biblioref">[5]</a></span> by Brakerski, Gentry
+and Vaikuntanathan, BGV is a Fully Homomorphic encryption scheme based
+on the R-LWE problem, and is very close to BFV <span class="citation"
+data-cites="BFV"><a href="#ref-BFV" role="doc-biblioref">[6]</a></span>
+another lattices-based FHE scheme. Compared to BFV, BGV has multiple
+ciphertext modulis <span class="math inline">p_i</span> depending on its
+parameter <span class="math inline">L</span> (described thereafter).
+Both algorithms also differ in their message scaling, which prevents the
+noise from growing to much after executing many operations.</p>
+<h4 data-number="2.2.1"
+id="parameters-polynomial-rings-and-distributions"><span
+class="header-section-number">2.2.1</span> Parameters, Polynomial Rings
+and Distributions</h4>
+<p>Regarding BGV’s parameters, we define <span
+class="math inline">L</span> as the number of prime modulis <span
+class="math inline">p_i</span>, <span class="math inline">q_l = p_0
+\times ... \times p_{l}</span> is the ciphertext modulus corresponding
+to the encryption level <span class="math inline">l</span>, where <span
+class="math inline">0 \leq l \leq L</span>, <span
+class="math inline">n</span> as the degree of the polynomials<a
+href="#fn1" class="footnote-ref" id="fnref1"
+role="doc-noteref"><sup>1</sup></a>, and <span
+class="math inline">t</span> the plaintext modulus<a href="#fn2"
+class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.
+From these parameters, the plaintext polynomial ring is defined as <span
+class="math inline">\mathcal{P} = \mathcal{R}_{t} = \mathbb{Z}_{t}[x] /
+(x^n + 1)</span> where all coefficients are in <span
+class="math inline">\mathbb{Z}_{t}</span>, the ciphertext ring as <span
+class="math inline">\mathcal{C} = \mathcal{R}_{q_l} \times
+\mathcal{R}_{q_l}</span> a pair of polynomials in <span
+class="math inline">\mathcal{R}_{q_l} = \mathbb{Z}_{q_l}[x] / (x^n +
+1)</span>, whose coefficients are in <span
+class="math inline">\mathbb{Z}_{q}</span>.</p>
+<p>Finally, the protocol relies on three different distributions to
+sample random polynomials: </p>
+<ul>
+<li>A Uniform ternary distribution over <span
+class="math inline">\mathcal{R}_{2} = \{-1, 0, 1\}</span><a href="#fn3"
+class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>
+mainly for the secret key.</li>
+<li>A Uniform distribution over <span
+class="math inline">\mathcal{R}_{q}</span></li>
+<li>A (truncated) Discrete Gaussian distribution <span
+class="math inline">\chi</span> for error polynomials, with parameters
+<span class="math inline">\mu = 0</span>, <span
+class="math inline">\sigma = 3.2</span> and <span
+class="math inline">\beta = 19</span> according to <span
+class="citation"
+data-cites="HomomorphicEncryptionSecurityStandard inferati_fhe_bgv"><a
+href="#ref-HomomorphicEncryptionSecurityStandard"
+role="doc-biblioref">[7]</a>, <a href="#ref-inferati_fhe_bgv"
+role="doc-biblioref">[8]</a></span>. <span
+class="math inline">\beta</span> corresponds to the absolute bound of
+the truncated discrete gaussian i.e., each element <span
+class="math inline">x</span> is in <span class="math inline">\{-19, ...,
+0, ..., 19\}</span></li>
+</ul>
+<h4 data-number="2.2.2" id="protocol-clients-primitive"><span
+class="header-section-number">2.2.2</span> Protocol Client’s
+primitive</h4>
+<p>In the scope of this project, we only considered the client’s
+primitive, i.e. the Key Generation, the Encryption and the Decryption.
+In fact, we consider that the usage of this BGV client implementation is
+for instance to encrypt and decrypt data stored on the cloud, without
+applying any intermediate server operation, while offering constant-time
+computation. These three primitives are similar from Regev’s encryption
+scheme.</p>
+<p><strong>The Key Generation</strong> takes the client’s secret key
+<span class="math inline">\mathsf{SK}</span>, a random ternary
+polynomial over <span class="math inline">\mathcal{R}_{2}</span>, as
+input and computes the public key <span class="math inline">\mathsf{PK}
+= (\mathsf{PK_1}, \mathsf{PK_2})</span> as follows:</p>
+<p><span class="math display"> \mathsf{PK_1}= -1(a \cdot \mathsf{PK} + t
+\cdot e) \; \text{mod $q_l$}</span> <span class="math display">
+\mathsf{PK_2} = a </span></p>
+<p>where <span class="math inline">a</span> is a polynomial sampled
+uniformly at random over <span
+class="math inline">\mathcal{R}_{q_l}</span>, and <span
+class="math inline">e</span> is a random error polynomial sampled over
+<span class="math inline">\chi</span>. Here, <span
+class="math inline">t</span> is the scaling factor.</p>
+<p><strong>The Encryption</strong> takes a plaintext <span
+class="math inline">\mathsf{M} \in \mathcal{P}</span>, and the
+previously computed public key <span
+class="math inline">\mathsf{PK}</span>, and outputs the ciphertext <span
+class="math inline">\mathsf{C} = (\mathsf{C_1}, \mathsf{C_2}) \in
+\mathcal{C}</span> as follows:</p>
+<p><span class="math display"> \mathsf{C_1} = (\mathsf{PK_1} \cdot u + t
+\cdot e_1 + \mathsf{M} ) \; \text{mod $q_l$}</span> <span
+class="math display"> \mathsf{C_2} =  (\mathsf{PK_2} \cdot u + t \cdot
+e_2) \; \text{mod $q_l$} </span></p>
+<p>where <span class="math inline">u</span> is a ternary polynomial
+sampled uniformly at random over <span
+class="math inline">\mathcal{R}_{2}</span>, and <span
+class="math inline">e_1</span> and <span class="math inline">e_2</span>
+are random error polynomials sampled over <span
+class="math inline">\chi</span>.</p>
+<p><strong>The Decryption</strong> returns the original message <span
+class="math inline">M</span> by taking the corresponding ciphertext
+<span class="math inline">\mathsf{C} = (\mathsf{C_1},
+\mathsf{C_2})</span> and the client’s secret key <span
+class="math inline">\mathsf{SK}</span> in the following way:<a
+href="#fn4" class="footnote-ref" id="fnref4"
+role="doc-noteref"><sup>4</sup></a></p>
+<p><span class="math display">\mathsf{C_1} + \mathsf{C_2} \cdot
+\mathsf{SK} \; \text{mod $t$} = \mathsf{M} + t \cdot v  \; \text{mod
+$t$} = M \; \text{mod $t$} </span></p>
+<p>where <span class="math inline">v</span> is the noise vector.
+However, the last equality is correct only if <span
+class="math inline">\|v\|_\infty &lt; \frac{q_l}{2t}</span>, due to
+noise growth being to important, thus destroying the message.</p>
+<p>Consequently, the security property is based on the hardness for an
+adversary to recover the plaintext from the ciphertext plus some noise,
+without knowing the secret key, similarly to LWE.</p>
+<p><strong>Remark on <span
+class="math inline">\mathcal{R}_{q_l}</span></strong> Previously, we
+defined all the polynomial’s coefficients in <span
+class="math inline">\mathcal{R}_{q_l}</span>. In practice, we do not
+multiply each small modulis <span class="math inline">p_i</span> but
+rather perform all operation for each modulus individually and send
+<span class="math inline">l</span> polynomials. Hence we have an
+efficient solution, while preserving its correctness. In fact, as the
+smaller modulis are all primes, and a fortiori pairwise coprime, we can
+apply the Chinese Remainder Theorem to show that the mapping</p>
+<p><span class="math display"> \mathcal{R}_{q_l} \cong \mathcal{R}_{p_0}
+\times ... \times \mathcal{R}_{p_l}</span></p>
+<p>is a ring isomorphism.</p>
+<h3 data-number="2.3" id="side-channel-attacks"><span
+class="header-section-number">2.3</span> Side-channel attacks</h3>
+<p>Although lattices-based cryptography and FHE offer strong
+cryptographic properties, it is still possible for an adversary to
+recover the encrypted data. Side-channel attacks can be deployed and
+targets implementations to leverage physical leakage and exploiting
+vulnerabilities.</p>
+<p>Homomorphic Encryption algorithms can have multiples attack vectors.
+Single power measurement analysis on BFV Gaussian sampler based on
+control-flow variations <span class="citation"
+data-cites="attackondgs"><a href="#ref-attackondgs"
+role="doc-biblioref">[9]</a></span>, cache-timing attack triggered by a
+non-constant time Barrett modular multiplication <span class="citation"
+data-cites="cachetiminattack"><a href="#ref-cachetiminattack"
+role="doc-biblioref">[10]</a></span>, or two single measurement attacks
+due to ternary value assignment leaking during the Key Generation phase
+<span class="citation" data-cites="attackonkeygen"><a
+href="#ref-attackonkeygen" role="doc-biblioref">[11]</a></span> are
+examples of feasible side-channel attacks on FHE implementations to
+obtain the secret key with high precision. Therefore, constant-time and
+formally verified implementations are necessary to ensure the systems’
+security.</p>
+<p><strong>Remark on constant-timeness.</strong> When referring to
+constant-timeness for an implementation or a program, we only consider
+the constant-timeness of the code, not the hardware. According to
+definition from Jasmin repository’s wiki <span class="citation"
+data-cites="jasminwiki"><a href="#ref-jasminwiki"
+role="doc-biblioref">[12]</a></span>, “a program is said to be constant
+time when neither the control-flow nor the memory accesses depend on
+sensitive data”. Hence, we assume that hardware operations are
+correct.</p>
+<h3 data-number="2.4" id="projects-description"><span
+class="header-section-number">2.4</span> Project’s description</h3>
+<p>In this project, we implement a BGV scheme in Jasmin, a safe
+high-assurance and high-speed cryptographic language. We deploy
+well-known cryptographic efficient or constant-time techniques (Barrett
+Reduction, NTT, …), and we used a Rust wrapper to handle and test the
+Jasmin implementations. Ensuring and proving constant-timeness and
+rigorous reasoning require to trust considerably and increase the attack
+surface.</p>
+<h2 data-number="3" id="technical-section"><span
+class="header-section-number">3</span> Technical Section</h2>
+<p>In this section, we detail the Jasmin implementation of our BGV
+client i.e., the difference with ML-KEM, our set-up and the
+implementation of the different primitives we used, as well as the Rust
+wrapper that will call the assembly extracted from Jasmin to run and
+test its functionality. Our implementation is based the on MLKEM Jasmin
+implementation from <span class="citation" data-cites="jasminkyber"><a
+href="#ref-jasminkyber" role="doc-biblioref">[13]</a></span>, and
+therefore will adopt much of their nomenclature and approach, although
+with some significant differences.</p>
+<h3 data-number="3.1" id="from-kyber-implementation-to-bgv"><span
+class="header-section-number">3.1</span> From KYBER implementation to
+BGV</h3>
+<p>Compared to their ML-KEM implementation, BGV requires less
+cryptographic primitives (KDF, Hash function, …), whereas it needs to be
+more modular than KYBER. In fact, parameters, such as the modulo <span
+class="math inline">q</span> or the polynomial size <span
+class="math inline">n</span>, are generally fixed in ML-KEM. For
+instance, <span class="math inline">q</span> is often 3329 like for
+KYBER-512 or KYBER-1024 (c.f. <span class="citation"
+data-cites="Avanzi2017CRYSTALSKyberAS"><a
+href="#ref-Avanzi2017CRYSTALSKyberAS"
+role="doc-biblioref">[14]</a></span>). For BGV, there are small multiple
+modulis <span class="math inline">\{p_0,p_1,...,p_L \}</span>, all of
+which can be modified according to the bit size of the Encryption Level
+modulo <span class="math inline">q_L = p_0 \times ... \times
+p_{L}</span>.</p>
+<p>Another difference is the wrapper and testing environment around the
+Jasmin code. In the original implementation, the Jasmin code is compiled
+in assembler by the Jasmin compiler, and called at runtime by a C
+wrapper. For this project, we made the wrapper in Rust to extend the
+deployment assembly compiled from Jasmin to another language.</p>
+<p>On the other hand, plenty of primitives used by the BGV scheme are
+very similar and already done for KYBER implementation, such as the NTT
+and INTT, Barrett and Montgomery reduction. Therefore, they needed to be
+partially adapted to match our implementation. Furthermore, we keep
+functions and files nomenclature from the original project. In fact,
+functions having the <code>export</code>keyword are meant to be
+accessible by outside and serves as API for the Jasmin code. Therefore,
+will be written with a ‘j’ as the first letter (e.g.,
+<code>jbgv_encrypt_jazz</code>); function starting with a <code>_</code>
+(e.g., <code>_poly_reduce_mod_t</code>) are functions that performs
+operation directly on polynomials; and finally the other functions are
+performing operations on values (e.g.,
+<code>__barrett_reduce_Q1</code>). Similarly, if a file contains
+functions that can be called from outside, its name will begin with a
+‘j’ and end with <code>.jazz</code>, while others will only end in
+<code>.jinc</code>.</p>
+<h3 data-number="3.2" id="set-up"><span
+class="header-section-number">3.2</span> Set up</h3>
+<p>For our project, we aim to make the project work for the parameters
+<span class="math inline">n = 1024 = 2^{10}</span>, and <span
+class="math inline">log_2(q) = 52</span>, according to the Homomorphic
+Encryption Security Standard<span class="citation"
+data-cites="HomomorphicEncryptionSecurityStandard"><a
+href="#ref-HomomorphicEncryptionSecurityStandard"
+role="doc-biblioref">[7]</a></span>. However, computing and compiling
+constants such as the <span class="math inline">\Psi</span> tables for
+<span class="math inline">n = 1024</span> coefficients was too costly
+for Jasmin compiler. Hence, our default version start at <span
+class="math inline">n = 32</span>. In addition, we stay with only one
+modulus (i.e., <span class="math inline">L = 1</span>). As all the
+constants will be replaced directly in the code assembly by the Jasmin
+compiler, we have implemented the whole protocol for a modulus q1, and
+afterwards we could develop the Rust wrapper builder so that it
+duplicates the Jasmin implementations according to the number of modulis
+chosen, calculates all the variables depending on each modulus (e.g.,
+the <span class="math inline">\psi</span> needed for the NTT), and
+writes them directly to each respective Jasmin project before compiling
+and using them. We also fixed the plaintext modulus <span
+class="math inline">t</span> to <span class="math inline">65537</span>,
+as described in <span class="citation"
+data-cites="cryptoeprint:2021/204"><a href="#ref-cryptoeprint:2021/204"
+role="doc-biblioref">[15]</a></span>. In fact, <span
+class="math inline">t</span> must be of the form <span
+class="math inline">p^r</span>, where <span class="math inline">p</span>
+is coprime to <span class="math inline">2n</span>. Hence, we fixed <span
+class="math inline">r = 1</span> and <span class="math inline">p =
+2^{16} + 1</span>.</p>
+<p>In addition, the coefficients are computed on 64-bits unsigned
+integers. It is necessary to emphasize that the integer representation
+in <span class="math inline">\mathbb{Z}_q</span> and in <span
+class="math inline">\{0,...,2^{64}-1\}</span> is obviously not the same.
+Therefore, subtractions and all other overflow/underflow problems must
+be handled cautiously to maintain the system coherency. Therefore, the
+Montgomery factor used for its form will be <span
+class="math inline">2^{64}</span>.</p>
+<p>Finally, we assume that all the basic operations (addition,
+multiplication) supported and compiled by the Jasmin compiler are made
+in constant-time since Jasmin’s thread model assume that its generated
+assembly executed on hardware with constant-time operations as described
+previously. We also assume that all vectors are in Montgomery form and
+NTT form upon performing multiplications, additions, or any other
+operations.</p>
+<h3 data-number="3.3" id="basic-polynomial-operations"><span
+class="header-section-number">3.3</span> Basic polynomial
+operations</h3>
+<p>Mostly taken from the original implementation, we only have
+polynomial addition and element-wise multiplication as two basic
+operations on polynomial. Basically, these two functions performs their
+operations in <span class="math inline">\mathbb{Z}_q</span>.</p>
+<h3 data-number="3.4" id="barrett-reduction"><span
+class="header-section-number">3.4</span> Barrett Reduction</h3>
+<p>When computing values in <span
+class="math inline">\mathbb{Z}_q</span>, we need the modulo
+<code>%</code> operation. Even if Jasmin supports the modulo, it’s
+clearly not most efficient and practical operation as it might take a
+lot of time to compute the result. Hence, we implemented the Barrett
+reduction algorithm, which reduces an element to its remainder in a
+field. Although a version exists for ML-KEM, ours is taken from the
+OpenFHE’s project<span class="citation" data-cites="OpenFHE"><a
+href="#ref-OpenFHE" role="doc-biblioref">[16]</a></span>, which adapts
+the algorithm described in <span class="citation"
+data-cites="menezes1996handbook"><a href="#ref-menezes1996handbook"
+role="doc-biblioref">[17]</a></span>. We implemented it to reduce a
+128-bit unsigned integer split in two 64-bits integer modulo the
+ciphertext modulus <span class="math inline">q</span>, as well as to
+reduce a 64-bit modulo <span class="math inline">t</span> our plaintext
+modulus.</p>
+<h3 data-number="3.5" id="montgomery-reduction"><span
+class="header-section-number">3.5</span> Montgomery Reduction</h3>
+<p>Another well known primitive used for its efficiency is the
+Montgomery reduction <span class="citation"
+data-cites="montgomery_reduction"><a href="#ref-montgomery_reduction"
+role="doc-biblioref">[18]</a></span>. This algorithm allows to speed
+modular multiplication without modifying the addition. In fact, every
+coefficient in <span class="math inline">\mathbb{Z}_{q}</span> will be
+represented as <span class="math inline">\bar{a} = aR \text{mod}
+q</span>, where <span class="math inline">a</span> is the coefficient in
+normal form, and <span class="math inline">R</span> is a radix such that
+<span class="math inline">R\ge q</span> and <span
+class="math inline">\text{gcd}(q,R) = 1</span>. We call <span
+class="math inline">\bar{a}</span>, the Montgomery form of <span
+class="math inline">a</span>. Therefore, addition and multiplication
+with Montgomery form become: <span class="math display"> aR + bR = (a +
+b)R \quad \text{mod $q$}</span> <span class="math display"> (a \times b)
+R = (aR \times bR)R^{-1} = (\bar{a} \times \bar{b})R^{-1} \quad
+\text{mod $q$}</span></p>
+<p>We use Montgomery reduction to speed up algorithm by “allowing
+efficient implementations of modular multiplication without explicitly
+carrying out the classical modular reduction step”. <span
+class="citation" data-cites="menezes1996handbook"><a
+href="#ref-menezes1996handbook" role="doc-biblioref">[17]</a></span>
+Chapter 14. As the modulus <span class="math inline">q</span> will be
+always odd, we can fix the radix <span class="math inline">R</span> to
+be a power of 2. Hence, we choose <span class="math inline">R =
+2^{64}</span>.</p>
+<p>In <code>bgvpoly.jinc</code>, we created the methods
+<code>_poly_from_mont</code> and <code>_poly_to_mont</code>, which
+transforms a polynomial’s coefficients from their Montgomery form to
+their normal form, and vice-versa. Furthermore, we implemented the
+method <code>__fqmul</code> in <code>bgvreduce.jinc</code>, which takes
+two unsigned 64-bits integer in Montgomery form and returns their
+product in <span class="math inline">\mathbb{Z}_{q}</span> according to
+the multiplication described above.</p>
+<h3 data-number="3.6" id="ntt-intt"><span
+class="header-section-number">3.6</span> NTT &amp; INTT</h3>
+<p>Multiplying two polynomials in the quotient ring <span
+class="math inline">\mathcal{R}_{q} = \mathbb{Z}_{q}[X] / (X^n +
+1)</span> is equivalent to the convolution of the coefficients reduced
+modulo <span class="math inline">q</span>, and then performing a long
+division on the new polynomial of degree <span class="math inline">\leq
+2n</span> by <span class="math inline">X^n + 1</span>. Computing this
+convolution and this division is costly and clearly not constant-time
+depending on the input polynomials. To optimize and reduce the cost of
+the operations, many encryption schemes rely on the Number Theoretic
+Transform <span class="citation" data-cites="cryptoeprint:2024/585"><a
+href="#ref-cryptoeprint:2024/585" role="doc-biblioref">[19]</a></span>,
+or NTT, (and a fortiori, its inverse) to represent their polynomials
+into vectors. Indeed, two polynomial in NTT form can be multiplied
+element-wise, reduced modulo <span class="math inline">q</span>, and
+after retransforming the computed into its normal form after applying
+the Inverse NTT, we obtain the same results as performing the
+convolution and the long division. Furthermore, the NTT also satisfies
+the addition and the scalar multiplication, thus keeping the coherency
+for polynomial addition and Montgomery form.</p>
+<p>Similarly to other implementations, we base the NTT on the
+Cooley-Turkey (CT) butterfly algorithm, and the INTT on Gentleman-Sande
+(GS) butterfly algorithm from <span class="citation"
+data-cites="ntt_transform"><a href="#ref-ntt_transform"
+role="doc-biblioref">[20]</a></span> (Algorithm 1 &amp; 2). Both
+algorithms are optimized variants of these two transforms. The NTT make
+use of the precomputed table <span class="math inline">\Psi \in
+\mathbb{Z}^n_q</span>, which stores powers of <span
+class="math inline">\psi</span>, a primitive 2<span
+class="math inline">n</span>-th root of unity in <span
+class="math inline">\mathbb{Z}_q</span> such that <span
+class="math inline">\psi^n \equiv -1 \  \text{mod} \  q</span>, while
+the INTT make use of the precomputed table <span
+class="math inline">\Psi^{-1} \in \mathbb{Z}^n_q</span>, which stores
+powers of <span class="math inline">\psi^{-1}</span>, the multiplicative
+inverse in <span class="math inline">\mathbb{Z}_q</span>. To speed up
+the computation, these tables are precomputed by the Rust wrapper and
+hard-coded in file <code>psis.jinc</code> before compiling the code<a
+href="#fn5" class="footnote-ref" id="fnref5"
+role="doc-noteref"><sup>5</sup></a>. The Rust wrapper NTT implementation
+(c.f. <code>helpers/ntt.rs</code>), and <span
+class="math inline">\Psi</span> computation (in Montgomery form) are
+adapted from the Lattirust library, maintained by Christian Knabenhans
+<span class="citation" data-cites="lattirust2025"><a
+href="#ref-lattirust2025" role="doc-biblioref">[21]</a></span>.</p>
+<!-- **Remark on \textsc{K-RED}.** In @ntt_transform, the authors introduced a new modular technique called \textsc{K-RED}, which improves the  performance of the forward and inverse modified NTT by a factor 2.11 and 1.98 respectively (See @ntt_transform, Section 5.1). TODO -->
+<h3 data-number="3.7" id="sampling-random-polynomials"><span
+class="header-section-number">3.7</span> Sampling random
+polynomials</h3>
+<p>Sampling random polynomials according to multiple distributions is a
+key primitive of lattice encryption schemes such as BGV or KYBER. The
+main challenge is preserving the distribution correctness from bytes
+randomly generated while sampling the coefficient in constant-time. In
+our BGV implementation based on <span class="citation"
+data-cites="inferati_fhe_bgv"><a href="#ref-inferati_fhe_bgv"
+role="doc-biblioref">[8]</a></span>, we consider the three 3 types of
+distribution in previously mentioned.</p>
+<p>All the functions that samples random polynomials according to the
+three distributions mentioned above are implemented in
+<code>src/jasmin/sampler.jinc</code>. In the following subsection, we
+described how we handled the Jasmin Syscall generating random bytes, and
+the reasoning behind each sampling implementations.</p>
+<h4 data-number="3.7.1" id="jasmin-syscall"><span
+class="header-section-number">3.7.1</span> Jasmin Syscall</h4>
+<p>To generates random bytes in Jasmin, there exist the Syscall
+<code>#randombytes</code>, which takes a <code>reg ptr</code> (i.e., a
+pointer morally <span class="citation" data-cites="jasminwiki"><a
+href="#ref-jasminwiki" role="doc-biblioref">[12]</a></span> Section
+Arrays). However, the Syscall must be handled by the user according to
+the project’s wiki. In our project, we implemented the function
+<code>__jasmin_syscall_randombytes__</code> in Rust (c.f.
+<code>main.rs</code>) taking a raw pointer on unsigned bytes and a
+length, and returning the same pointer with each byte randomly
+generated.<a href="#fn6" class="footnote-ref" id="fnref6"
+role="doc-noteref"><sup>6</sup></a> Because the Syscall’s function body
+is not considered by Jasmin in its threat model, we assume that its in
+constant time. In practice, we must verify that its implementation is
+constant-time.</p>
+<h4 data-number="3.7.2" id="uniform-distribution-sampling"><span
+class="header-section-number">3.7.2</span> Uniform Distribution
+Sampling</h4>
+<p>To ensure uniform distribution sampling, we adopted two methods. For
+ternary polynomials, we proceed by rejection sampling (c.f.
+<code>__sample_random_poly_ternary</code>). For each coefficient, we
+generate one byte, and we keep only the last two bits. If these two bits
+equals 3, we redraw the byte. Otherwise, we subtract one. Hence, we
+prevent the secret key from being biased because the value 0 and 3 are
+congruent modulo 3, and will increase the probability of having -1 for
+each coefficient of the secret key.</p>
+<p>For polynomials over <span class="math inline">\mathcal{R}_{q}</span>
+(c.f. <code>__sample_random_poly_mod_q</code>), we avoid rejection
+sampling because it will be clearly inefficient. Instead, we generate
+randomly <span class="math inline">n+2</span> 64-bits unsigned integer.
+Then, we remove the two extras 64-bits integer, and we apply the modulo
+on the <span class="math inline">n</span> integer remaining. In fact,
+adding the two extra integers reduces the bias probability, and hence we
+can approximate the uniform distribution as closely as possible.</p>
+<h4 data-number="3.7.3" id="gaussian-distribution-sampling"><span
+class="header-section-number">3.7.3</span> Gaussian Distribution
+Sampling</h4>
+<p>To sample values following a discrete Gaussian distribution, we
+adapted the <code>DGS_DISC_GAUSS_UNIFORM_TABLE</code> from <span
+class="citation" data-cites="dgs"><a href="#ref-dgs"
+role="doc-biblioref">[22]</a></span>. This sampler uses a precomputed
+table of probabilities <span class="math inline">\rho</span>, where the
+number of entries corresponds to the size of the set covered by of the
+Gaussian distribution (i.e. <span class="math inline">2*\beta +
+1</span>). In our situation, there are <span
+class="math inline">39</span> entries from <span
+class="math inline">0</span> to <span class="math inline">38</span><a
+href="#fn7" class="footnote-ref" id="fnref7"
+role="doc-noteref"><sup>7</sup></a>. Each entry’s probability is
+computed as follows:</p>
+<p><span class="math display"> \rho_x = \exp^{-\frac{(x -
+\mu)^2}{2\sigma^2}}  \quad {-\beta} \leq x \leq \beta</span></p>
+<p>As they are probabilities, each <span
+class="math inline">\rho_x</span> are in <span
+class="math inline">[0,1]</span>. However, Jasmin does not support
+Floating-point value, and hence, we cannot store the table as it is. By
+multiplying each value by <span class="math inline">2^{64}</span> and
+rounding them, we keep the same distribution while using unsigned 64-bit
+integer as comparison. Therefore, we can precompute the table with the
+Rust wrapper, and we can directly write it in the Jasmin code (c.f.
+<code>rhos.jinc</code>).</p>
+<p>To generate our coefficients with respect to the Gaussian
+distribution, we then proceed as follows (c.f.
+<code>__sample_gaussian_distribution</code>):</p>
+<ul>
+<li>We generate a random byte <span class="math inline">x</span>, we
+keep only the six last bit and if the value is greater than 39, we
+redraw.</li>
+<li>We generate a random 64-bits unsigned integer <span
+class="math inline">y</span>.</li>
+<li>If <span class="math inline">y</span> is smaller than <span
+class="math inline">\rho_x</span>, we keep <span
+class="math inline">x</span> and subtract <span
+class="math inline">\beta</span> to obtain the real corresponding
+offset. The result will be our coefficient. Otherwise, we restart at the
+first step.</li>
+</ul>
+<p>We continue this procedure until we obtain a valid coefficient, and
+we repeat for each coefficient of the vector.</p>
+<h3 data-number="3.8" id="clients-protocol"><span
+class="header-section-number">3.8</span> Client’s protocol</h3>
+<p>Similarly to Inferati’s post <span class="citation"
+data-cites="inferati_fhe_bgv"><a href="#ref-inferati_fhe_bgv"
+role="doc-biblioref">[8]</a></span> and according to the BGV’s protocol,
+we split in 3 key function in the <code>jbgv.jazz</code>:</p>
+<ul>
+<li><code>jbgv_keygen_secret_key</code> generates the client’s secret
+key according to the ternary distribution.</li>
+<li><code>jbgv_encrypt_jazz</code> takes the client’s secret key and a
+plaintext, and returns the corresponding ciphertext.</li>
+<li><code>jbgv_decrypt_jazz</code>takes the client’s secret key, and a
+ciphertext, and returns the corresponding plaintext.</li>
+</ul>
+<p>We choose to generate a random public key for each new plaintexts,
+and we don’t store the public key, only the secret, because we don’t
+need it to decrypt the ciphertext.</p>
+<p>To compile the Jasmin code with the Jasmin compiler, go in
+<code>src/jasmin/</code> and run in terminal:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;</span> jasminc <span class="ex">jbgv.jazz</span> <span class="at">-o</span> jbgv.s</span></code></pre></div>
+<p>To run an example of the protocol, run:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;</span> cargo <span class="ex">main</span></span></code></pre></div>
+<p>To run all the test, run:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="op">&gt;</span> cargo <span class="bu">test</span> <span class="at">--</span> <span class="at">--include-ignored</span></span></code></pre></div>
+<h2 data-number="4" id="result"><span
+class="header-section-number">4</span> Result</h2>
+<h3 data-number="4.1" id="methodology"><span
+class="header-section-number">4.1</span> Methodology</h3>
+<p>At first, we decided to keep the wrapper in C as in the KYBER
+repository, but in the end, we adopted Rust as our wrapper. To call the
+assembly compiled from Jasmin from Rust, we use a <code>build.rs</code>
+script, which builds the Rust project each time <code>jbgv.s</code>has
+been modified, and compile such that it can be used as a library by the
+Rust project.</p>
+<p>In <code>src/helpers/</code>, there are all the Rust files
+implementing either cryptographic functions ((I)NTT, Key generation,
+Encryption, etc), or functions that (pre)compute constant modulus, <span
+class="math inline">2n</span>th-root of unity, <span
+class="math inline">\rho_x</span>, … To ensure an “informal” functionnal
+correctness, we implemented the wrapper and the Jasmin project in
+parallel, and created a test suite in two parts:</p>
+<ul>
+<li>in <code>bgvpoly.rs</code>, there are all tests on function that
+performing operations on polynomials (e.g., addition, ntt, sampling,
+etc).</li>
+<li>in <code>bgv.rs</code>, there are all the tests on the protocol’s
+functions (Key Generation, Encryption, etc)</li>
+</ul>
+<p>Finally, the parameters can be found in
+<code>src/helpers/config.rs</code> for Rust, and in
+<code>src/jasmin/{params.jinc, psis.jinc, rhos.jinc}</code> for
+Jasmin.</p>
+<h3 data-number="4.2" id="benchmark"><span
+class="header-section-number">4.2</span> Benchmark</h3>
+<p><strong>Time Benchmark.</strong> We made some benchmarks to evaluates
+the efficiency of the Jasmin implementation compared to Rust. For
+performing <span class="math inline">2000000</span> NTT in a row, Jasmin
+has an overall mean of <span class="math inline">5.096
+\mu\text{s}</span>, compared with an overall mean of <span
+class="math inline">11.801\mu\text{s}</span> for Rust. Similarly with
+INTT, Jasmin took <span class="math inline">5.319\mu\text{s}</span>,
+compared with an overall mean of <span
+class="math inline">14.633\mu\text{s}</span> for Rust.</p>
+<p><strong>Gaussian Sampler accuracy.</strong> To verify our sampler
+accuracy, we sampled <span class="math inline">200000</span> polynomials
+of <span class="math inline">n=32</span>, we classified them and we
+computed the estimated mean and standard deviation. We obtain an
+estimated mean <span class="math inline">\mu&#39;</span> of <span
+class="math inline">0.0022</span>, and an estimated standard deviation
+<span class="math inline">\sigma&#39;</span> of <span
+class="math inline">3.1985</span>.</p>
+<h3 data-number="4.3" id="jasmin-takeaway"><span
+class="header-section-number">4.3</span> Jasmin Takeaway</h3>
+<p>Jasmin is a very interesting language based on a lot of good
+concepts. The possibility of having a very powerful cryptographic
+language that allows you to export its functional implementation to a
+formal verification tool, such as Easycrypt, is practical and powerful.
+However, the lack of documentation or tutorials was limiting to
+understand and exploit all the features and advantages of the language.
+Another example is the error returned by the compiler, which sometimes
+lacks clear explaination. These projects reflect the complexity of
+academic research, for which documentation and the scope of development
+are limited.</p>
+<p>Nevertheless, we did not entirely reached the goal of the project, as
+we were not able to formally verify the constant-timeness of our
+implementation by extracting the proof from our Jasmin program and
+running Easycrypt.</p>
+<h2 data-number="5" id="future-work"><span
+class="header-section-number">5</span> Future Work</h2>
+<h3 data-number="5.1"
+id="easycrypt-extraction-and-proving-constant-timeness"><span
+class="header-section-number">5.1</span> Easycrypt extraction and
+proving constant-timeness}</h3>
+<p>Afterwards, our intention is to use the Easycrypt framework, by
+extracting our Jasmin implementation, which can be done natively by
+Jasmin, to prove its cryptographic security and constant-timeness.</p>
+<h3 data-number="5.2" id="rust-wrapper-extension"><span
+class="header-section-number">5.2</span> Rust Wrapper extension</h3>
+<p>In future development, we want to develop the Rust build script to be
+able to compile all the Jasmin code, as well as handling multiple
+modulus by duplicates Jasmin projects for each modulus and its
+respective constants, write in Jasmin and Rust file. The objective would
+be to have a completely modular program with a default
+configuration.</p>
+<h2 data-number="6" id="conclusion"><span
+class="header-section-number">6</span> Conclusion</h2>
+<p>This project presented a constant-time client-side implementation of
+the BGV Fully Homomorphic Encryption scheme, targeting both
+cryptographic soundness and implementation-level security. Built on
+post-quantum lattice assumptions, FHE ensures privacy-preserving
+computation, making it a compelling solution in a future shaped by
+quantum threats. By leveraging the Jasmin language for secure and
+verifiable low-level programming, we demonstrated the feasibility of
+implementing BGV primitives in a constant-time manner, while also
+addressing challenges such as polynomial arithmetic, modular reduction,
+and secure sampling.</p>
+<p>Although full formal verification via EasyCrypt remains future work,
+our results highlight the practicality and performance benefits of
+carefully engineered constant-time implementations. As the need for
+secure data processing continues to grow—particularly in areas like
+cloud computing and machine learning—FHE, and efficient, secure
+implementations like the one developed in this project, will be key to
+building strong, quantum-resistant privacy solutions.</p>
+<h2 class="unnumbered" id="references">References</h2>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0"
+role="list">
+<div id="ref-LWEandRegevEncryptionScheme" class="csl-entry"
+role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">O.
+Regev, <span>“On lattices, learning with errors, random linear codes,
+and cryptography,”</span> in <em>Proceedings of the thirty-seventh
+annual ACM symposium on theory of computing</em>, in STOC ’05. New York,
+NY, USA: Association for Computing Machinery, 2005, pp. 84–93. doi: <a
+href="https://doi.org/10.1145/1060590.1060603">10.1145/1060590.1060603</a>.</div>
+</div>
+<div id="ref-cryptoeprint:2015/939" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">C.
+Peikert, <span>“A decade of lattice cryptography.”</span> Cryptology
+<span>ePrint</span> Archive, Paper 2015/939, 2015. Available: <a
+href="https://eprint.iacr.org/2015/939">https://eprint.iacr.org/2015/939</a></div>
+</div>
+<div id="ref-RLWE" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">V.
+Lyubashevsky, C. Peikert, and O. Regev, <span>“On ideal lattices and
+learning with errors over rings,”</span> <em>J. ACM</em>, vol. 60, no.
+6, Nov. 2013, doi: <a
+href="https://doi.org/10.1145/2535925">10.1145/2535925</a>.</div>
+</div>
+<div id="ref-kyber" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">J.
+Bos <em>et al.</em>, <span>“<span>CRYSTALS</span> – kyber: A
+<span>CCA</span>-secure module-lattice-based <span>KEM</span>.”</span>
+Cryptology <span>ePrint</span> Archive, Paper 2017/634, 2017. doi: <a
+href="https://doi.org/10.1109/EuroSP.2018.00032">10.1109/EuroSP.2018.00032</a>.</div>
+</div>
+<div id="ref-BGV" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">Z.
+Brakerski, C. Gentry, and V. Vaikuntanathan, <span>“Fully homomorphic
+encryption without bootstrapping.”</span> Cryptology <span>ePrint</span>
+Archive, Paper 2011/277, 2011. Available: <a
+href="https://eprint.iacr.org/2011/277">https://eprint.iacr.org/2011/277</a></div>
+</div>
+<div id="ref-BFV" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">J.
+Fan and F. Vercauteren, <span>“Somewhat practical fully homomorphic
+encryption.”</span> Cryptology <span>ePrint</span> Archive, Paper
+2012/144, 2012. Available: <a
+href="https://eprint.iacr.org/2012/144">https://eprint.iacr.org/2012/144</a></div>
+</div>
+<div id="ref-HomomorphicEncryptionSecurityStandard" class="csl-entry"
+role="listitem">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">M.
+Albrecht <em>et al.</em>, <span>“Homomorphic encryption security
+standard,”</span> HomomorphicEncryption.org; HomomorphicEncryption.org,
+Toronto, Canada, 2018.</div>
+</div>
+<div id="ref-inferati_fhe_bgv" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[8] </div><div
+class="csl-right-inline">Inferati, <span>“Understanding fully
+homomorphic encryption (FHE) schemes: BGV.”</span> <a
+href="https://www.inferati.com/blog/fhe-schemes-bgv"
+class="uri">https://www.inferati.com/blog/fhe-schemes-bgv</a>,
+2025.</div>
+</div>
+<div id="ref-attackondgs" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">F.
+Aydin, E. Karabulut, S. Potluri, E. Alkim, and A. Aysu, <span>“RevEAL:
+Single-trace side-channel leakage of the SEAL homomorphic encryption
+library,”</span> in <em>2022 design, automation &amp; test in europe
+conference &amp; exhibition (DATE)</em>, 2022, pp. 1527–1532. doi: <a
+href="https://doi.org/10.23919/DATE54114.2022.9774724">10.23919/DATE54114.2022.9774724</a>.</div>
+</div>
+<div id="ref-cachetiminattack" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[10] </div><div class="csl-right-inline">W.
+Cheng, J.-L. Danger, S. Guilley, F. Huang, A. Bel Korchi, and O. Rioul,
+<span>“<span class="nocase">Cache-Timing Attack on the SEAL Homomorphic
+Encryption Library</span>,”</span> in <em><span class="nocase">11th
+International Workshop on Security Proofs for Embedded Systems (PROOFS
+2022)</span></em>, Leuven, Belgium, Sep. 2022. Available: <a
+href="https://telecom-paris.hal.science/hal-03780506">https://telecom-paris.hal.science/hal-03780506</a></div>
+</div>
+<div id="ref-attackonkeygen" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[11] </div><div class="csl-right-inline">F.
+Aydin and A. Aysu, <span>“Leaking secrets in homomorphic encryption with
+side-channel attacks.”</span> Cryptology <span>ePrint</span> Archive,
+Paper 2023/1128, 2023. doi: <a
+href="https://doi.org/10.21203/rs.3.rs-3097727/v1">10.21203/rs.3.rs-3097727/v1</a>.</div>
+</div>
+<div id="ref-jasminwiki" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[12] </div><div
+class="csl-right-inline"><span>“Jasmin project wiki.”</span> 2025.
+Available: <a
+href="https://github.com/jasmin-lang/jasmin/wiki/">https://github.com/jasmin-lang/jasmin/wiki/</a></div>
+</div>
+<div id="ref-jasminkyber" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[13] </div><div class="csl-right-inline">J.
+B. Almeida <em>et al.</em>, <span>“Formally verifying kyber episode v:
+Machine-checked <span>IND</span>-<span>CCA</span> security and
+correctness of <span>ML</span>-<span>KEM</span> in
+<span>EasyCrypt</span>.”</span> Cryptology <span>ePrint</span> Archive,
+Paper 2024/843, 2024. Available: <a
+href="https://eprint.iacr.org/2024/843">https://eprint.iacr.org/2024/843</a></div>
+</div>
+<div id="ref-Avanzi2017CRYSTALSKyberAS" class="csl-entry"
+role="listitem">
+<div class="csl-left-margin">[14] </div><div class="csl-right-inline">R.
+Avanzi <em>et al.</em>, <span>“CRYSTALS-kyber algorithm specifications
+and supporting documentation,”</span> 2017. Available: <a
+href="https://api.semanticscholar.org/CorpusID:198992527">https://api.semanticscholar.org/CorpusID:198992527</a></div>
+</div>
+<div id="ref-cryptoeprint:2021/204" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[15] </div><div class="csl-right-inline">A.
+Kim, Y. Polyakov, and V. Zucca, <span>“Revisiting homomorphic encryption
+schemes for finite fields.”</span> Cryptology <span>ePrint</span>
+Archive, Paper 2021/204, 2021. Available: <a
+href="https://eprint.iacr.org/2021/204">https://eprint.iacr.org/2021/204</a></div>
+</div>
+<div id="ref-OpenFHE" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[16] </div><div class="csl-right-inline">A.
+A. Badawi <em>et al.</em>, <span>“<span>OpenFHE</span>: Open-source
+fully homomorphic encryption library.”</span> Cryptology ePrint Archive,
+Paper 2022/915, 2022. Available: <a
+href="https://eprint.iacr.org/2022/915">https://eprint.iacr.org/2022/915</a></div>
+</div>
+<div id="ref-menezes1996handbook" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[17] </div><div class="csl-right-inline">A.
+J. Menezes, J. Katz, P. C. van Oorschot, and S. A. Vanstone,
+<em>Handbook of applied cryptography</em>. in Discrete mathematics and
+its applications. CRC Press, 1996. Available: <a
+href="https://books.google.ch/books?id=MhvcBQAAQBAJ">https://books.google.ch/books?id=MhvcBQAAQBAJ</a></div>
+</div>
+<div id="ref-montgomery_reduction" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[18] </div><div class="csl-right-inline">P.
+L. Montgomery, <span>“Modular multiplication without trial
+division,”</span> <em>Mathematics of Computation</em>, vol. 44, no. 170,
+pp. 519–521, 1985, Accessed: Jun. 05, 2025. [Online]. Available: <a
+href="http://www.jstor.org/stable/2007970">http://www.jstor.org/stable/2007970</a></div>
+</div>
+<div id="ref-cryptoeprint:2024/585" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[19] </div><div class="csl-right-inline">A.
+Satriawan, R. Mareta, and H. Lee, <span>“A complete beginner guide to
+the number theoretic transform (<span>NTT</span>).”</span> Cryptology
+<span>ePrint</span> Archive, Paper 2024/585, 2024. doi: <a
+href="https://doi.org/10.1109/ACCESS.2023.3294446">10.1109/ACCESS.2023.3294446</a>.</div>
+</div>
+<div id="ref-ntt_transform" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[20] </div><div class="csl-right-inline">P.
+Longa and M. Naehrig, <span>“Speeding up the number theoretic transform
+for faster ideal lattice-based cryptography.”</span> Cryptology
+<span>ePrint</span> Archive, Paper 2016/504, 2016. Available: <a
+href="https://eprint.iacr.org/2016/504">https://eprint.iacr.org/2016/504</a></div>
+</div>
+<div id="ref-lattirust2025" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[21] </div><div class="csl-right-inline">C.
+Knabenhans, <span>“Lattirust.”</span> <a
+href="https://github.com/cknabs/lattirust"
+class="uri">https://github.com/cknabs/lattirust</a>; GitHub, 2025.</div>
+</div>
+<div id="ref-dgs" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[22] </div><div class="csl-right-inline">M.
+R. Albrecht and M. Walter, <span>“<span class="nocase">dgs</span>,
+<span>D</span>iscrete <span>G</span>aussians over the
+<span>I</span>ntegers,”</span> 2018. Available: <a
+href="https://bitbucket.org/malb/dgs">https://bitbucket.org/malb/dgs</a></div>
+</div>
+</div>
+<section id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>For efficiency reasons, <span
+class="math inline">n</span> is generally a power of 2.<a href="#fnref1"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Generally, <span class="math inline">t \ll q_l</span><a
+href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>In practice, it will be over <span
+class="math inline">\{q-1, 0, 1\}</span> as secret key’s coefficients
+are also in <span class="math inline">\mathbb{Z}_{q}</span><a
+href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Equation (4) on Inferati’s blog post on BGV<span
+class="citation" data-cites="inferati_fhe_bgv"><a
+href="#ref-inferati_fhe_bgv" role="doc-biblioref">[8]</a></span> shows
+the complete development.<a href="#fnref4" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>In our single modulus implementation, the values are
+hardcoded manually in the file.<a href="#fnref5" class="footnote-back"
+role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>Due to macOS adding an extra ‘_’, we implemented the
+function a second time starting with only one ‘_’ instead of two.<a
+href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Negative index are not possible, thus we add <span
+class="math inline">{+\beta}</span> to all the index.<a href="#fnref7"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>
