@@ -37,7 +37,7 @@ math: true
     }
 </style>
 
-*This paper was written under the supervision of Ph. D candidate Nicolas Badoux and Prof. Doc. sc. ETH Mathias Payer from HexHive Lab at EPFL and is available in PDF format on [this repository](https://github.com/abouquet27/typepp_report/blob/master/semester_project_report.pdf)*.
+*This paper was written under the supervision of Ph. D. candidate Nicolas Badoux and Prof. Doc. sc. ETH Mathias Payer from HexHive Lab at EPFL and is available in PDF format on [this repository](https://github.com/abouquet27/typepp_report/blob/master/semester_project_report.pdf)*.
 
 > *"Before I came here I was confused about this subject. Having listened to your lecture I am still confused. But on a higher level."* &emsp; &emsp; &emsp;- **Enrico Fermi**
 
