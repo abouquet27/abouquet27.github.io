@@ -70,13 +70,13 @@ customCSS = ["/custom.css"]
 
     # Hex colors for your content in light mode.
     code_color = "#000"                     # default is #000
-    code_background_color = "#FAF9F6"       # default is #E5E5E5
+    code_background_color = "#ffffff"       # default isrgb(225, 216, 216)
     code_block_color = "#FFF"               # default is #FFF
     code_block_background_color = "#1b1838" # default is #0b0432
-    content_bg_color = "#FAF9F6"            # default is #FAF9F6
+    content_bg_color = "#ffffff"            # default is #ffffff
     date_color = "#515151"                  # default is #515151
     link_color = "#5e0ea5"                  # default is #5e0ea5
-    list_color = "#2b3563"                        # default is #5A5A5A
+    list_color = "#2b3563"                        # default isrgb(27, 22, 22)
     post_title_color = "#303030"            # default is #303030
     table_border_color = "#E5E5E5"          # default is #E5E5E5
     table_stripe_color = "#F9F9F9"          # default is #F9F9F9
