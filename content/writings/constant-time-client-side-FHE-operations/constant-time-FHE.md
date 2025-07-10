@@ -1,7 +1,6 @@
 ---
 title: "Constant-Time client-side FHE operations"
 description: "Master semester project @ SPRING Lab, EPFL"
-author: "Adrien Bouquet"
 date: 2025-06-20
 tags: ["Constant-time", "FHE", "Cryptography"]
 link-citations: true

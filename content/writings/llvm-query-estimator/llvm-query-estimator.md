@@ -1,7 +1,6 @@
 ---
 title: "Implementing a Query Count Estimation"
 description: "Bachelor Project @ Dependable Systems Lab, EPFL"
-author: "Adrien Bouquet"
 date: 2023-06-09
 bibliography: references.bib
 tags: ["Symbolic Execution", "LLVM"]
@@ -372,11 +371,12 @@ The central point of this report is the implementation of the
     the pass
 </p>
 
-### Applying the pass on<code>COREUTILS</code>
+### Applying the pass on COREUTILS
+
 <p>The next step in evaluating the pass is to test its robustness,
     i.e. its ability not to crash when applied to programmes that are much
     more complex than the examples shown above. To this end, the pass was
-    applied to 30 <code>COREUTILS</code> <span class="citation" data-cites="coreutils"><a href="#ref-coreutils"
+    applied to 30<code>COREUTILS</code><span class="citation" data-cites="coreutils"><a href="#ref-coreutils"
             role="doc-biblioref">[4]</a></span> of different purposes and sizes.
     They were chosen for 2 reasons: firstly, because they are programmes
     rich in complexity and variety, and secondly, because the paper also
