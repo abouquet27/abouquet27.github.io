@@ -492,15 +492,15 @@ START WITH THE RELATED WORKS, TECHNICAL SECTION AND THE RESULTS FIRST -->
         role="doc-biblioref">[18]</a></span>. This algorithm allows to speed
     modular multiplication without modifying the addition. In fact, every
     coefficient in <span class="math inline">\mathbb{Z}_{q}</span> will be
-    represented as <span class="math inline">\bar{a} = aR \text{mod}
+    represented as <span class="math inline">\bar{a} = aR  \; \text{mod} \;
       q</span>, where <span class="math inline">a</span> is the coefficient in
     normal form, and <span class="math inline">R</span> is a radix such that
     <span class="math inline">R\ge q</span> and <span class="math inline">\text{gcd}(q,R) = 1</span>. We call <span
       class="math inline">\bar{a}</span>, the Montgomery form of <span class="math inline">a</span>. Therefore, addition
     and multiplication
     with Montgomery form become: <span class="math display"> aR + bR = (a +
-      b)R \quad \text{mod $q$}</span> <span class="math display"> (a \times b)
-      R = (aR \times bR)R^{-1} = (\bar{a} \times \bar{b})R^{-1} \quad
+      b)R \; \; \text{mod $q$}</span> <span class="math display"> (a \times b)
+      R = (aR \times bR)R^{-1} = (\bar{a} \times \bar{b})R^{-1} \;
       \text{mod $q$}</span>
   </p>
   <p>We use Montgomery reduction to speed up algorithm by “allowing
