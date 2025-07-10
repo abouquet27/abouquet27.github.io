@@ -3,9 +3,6 @@ title: "About"
 date: 2025-02-22T16:03:14+01:00
 draft: false
 ---
-
-Bienvenue!
-
 I am a Swiss-French student presently enrolled a Joint Master’s degree in Cybersecurity (Computer Science) between the **Swiss Federal
 Institutes of Technology in Lausanne (EPFL) and Zurich (ETHZ)**, since September 2023. While pursuing my Master’s degree, my main interests were **Cryptography, Information Security, Software Security, 
 Privacy Engineering, Machine Learning and Network Security**.
