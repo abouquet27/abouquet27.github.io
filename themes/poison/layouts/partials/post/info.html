@@ -13,7 +13,7 @@
       {{ with site.Taxonomies.author.Get . }}
       <span><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> - </span>
       {{ else }}
-      <span>{{ . }} - </span>
+      <span>{{ . }} &nbsp;-&nbsp;</span>
       {{ end }}
       {{ end }}
       {{ if .Date }}
@@ -21,7 +21,7 @@
         {{ .Date.Format "January 2, 2006" }}
       </time>
       {{ end }}
-      <span>  -  </span>
+      <span> &nbsp;-&nbsp; </span>
       <span class="reading-time">
         {{ if gt .ReadingTime 1 }}
         {{ .Scratch.Set "readingTime" "mins" }}
