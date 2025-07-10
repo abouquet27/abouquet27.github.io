@@ -1,9 +1,8 @@
-baseURL = "/"
+baseURL = "https://abouquet27.github.io/"
 languageCode = "en-us"
 name = "Adrien Bouquet"
 title = "Adrien's Dashbook"
 theme = "poison"
-paginate = 10
 pluralizelisttitles = false   # removes the automatically appended "s" on sidebar entries
 customCSS = ["/custom.css"]
 
@@ -116,7 +115,7 @@ customCSS = ["/custom.css"]
 [caches]
   [caches.images]
     dir = ':cacheDir/images'
-    
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
