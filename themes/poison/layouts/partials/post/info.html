@@ -11,7 +11,7 @@
     <div>
       {{ with .Params.author }}
       {{ with site.Taxonomies.author.Get . }}
-      <span><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> - </span>
+      <span><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a> &nbsp;-&nbsp; </span>
       {{ else }}
       <span>{{ . }} &nbsp;-&nbsp;</span>
       {{ end }}

@@ -2,7 +2,7 @@
 title: "Constant-Time client-side FHE operations"
 description: "Master semester project @ SPRING Lab, EPFL"
 date: 2025-06-20
-tags: ["Constant-time", "FHE", "Cryptography"]
+tags: ["Constant-time", "FHE", "Post-Quantum Cryptography", "Jasmin"]
 link-citations: true
 toc: true
 numbersections: true
